@@ -103,6 +103,9 @@ public final class CameraView: UIView {
   // CameraView+Zoom
   internal var pinchGestureRecognizer: UIPinchGestureRecognizer?
   internal var pinchScaleOffset: CGFloat = 1.0
+	//CameraView+Exposure
+	internal var fixedISO: Bool = false
+	internal var fixedExposureDuration: Bool = false
 
   internal let cameraQueue = CameraQueues.cameraQueue
   internal let videoQueue = CameraQueues.videoQueue

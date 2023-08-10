@@ -285,17 +285,18 @@ extension CameraView {
 			invokeOnError(.session(.cameraNotReady))
 			return
 		}
+//		ReactLogger.log(level: .info, message: NSString(format: "%.2f", device.lensPosition) as String)
 		
 		if key == "exposureTargetOffset" {
-			ReactLogger.log(level: .info, message: "EV Target Offset Changed")
-			ReactLogger.log(level: .info, message: NSString(format: "%.2f", device.exposureTargetOffset) as String)
-			ReactLogger.log(level: .info, message: NSString(format: "%.2f", device.exposureTargetBias) as String)
+			let newExposureTargetOffset = changes[NSKeyValueChangeKey.newKey] as! Float
+//			ReactLogger.log(level: .info, message: "Offset is : \(newExposureTargetOffset)")
+			
 			let body: NSDictionary = [
-				"iso": device.iso,
+				"iso": device.iso, 
 				"aperture": device.lensAperture,
-				"ev": device.exposureDuration.value,
 				"evOffset": device.exposureTargetOffset,
 				"shutterSpeed": device.exposureDuration.seconds,
+				"lensPosition": device.lensPosition
 			]
 			CameraEventEmitter.emitter.sendEvent(withName: "onChanged", body: body)
 		}

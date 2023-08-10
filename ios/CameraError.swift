@@ -79,6 +79,7 @@ enum DeviceError: String {
   case lowLightBoostNotSupported = "low-light-boost-not-supported"
   case focusNotSupported = "focus-not-supported"
   case notAvailableOnSimulator = "camera-not-available-on-simulator"
+	case customExposureNotSupported = "custom-exposure-not-supported"
 
   var code: String {
     return rawValue
@@ -102,6 +103,8 @@ enum DeviceError: String {
       return "The microphone was unavailable."
     case .notAvailableOnSimulator:
       return "The Camera is not available on the iOS Simulator!"
+		case .customExposureNotSupported:
+			return "The currently selected camera device does not support custom exposure!"
     }
   }
 }
