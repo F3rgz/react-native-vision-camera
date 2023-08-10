@@ -298,9 +298,9 @@ export class Camera extends React.PureComponent<CameraProps> {
    * @param iso
    * @returns
    */
-  public async updateExposureSettings(iso: Number): Promise<void> {
+  public async updateExposureSettings(settings: any): Promise<void> {
     try {
-      return CameraModule.updateExposureSettings(this.handle, iso);
+      return CameraModule.updateExposureSettings(this.handle, settings);
     } catch (e) {
       throw tryParseNativeCameraError(e);
     }

@@ -85,9 +85,13 @@ final class CameraViewManager: RCTViewManager {
   }
 	
 	@objc
-	final func updateExposureSettings(_ node: NSNumber, iso: NSNumber, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+	final func updateExposureSettings(_ node: NSNumber, settings: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
 		let component = getCameraView(withTag: node)
 		let promise = Promise(resolver: resolve, rejecter: reject)
+		guard let iso = settings["iso"] as? NSString else {
+			promise.reject(error: .parameter(.invalid(unionName: "settings", receivedValue: settings.description)))
+			return
+		}
 		component.updateExposureSettings(iso: iso, promise: promise)
 	}
 
