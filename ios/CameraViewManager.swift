@@ -83,6 +83,13 @@ final class CameraViewManager: RCTViewManager {
     let component = getCameraView(withTag: node)
     component.focus(point: CGPoint(x: x.doubleValue, y: y.doubleValue), promise: promise)
   }
+	
+	@objc
+	final func updateExposureSettings(_ node: NSNumber, iso: NSNumber, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+		let component = getCameraView(withTag: node)
+		let promise = Promise(resolver: resolve, rejecter: reject)
+		component.updateExposureSettings(iso: iso, promise: promise)
+	}
 
   @objc
   final func getAvailableVideoCodecs(_ node: NSNumber, fileType: String?, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {

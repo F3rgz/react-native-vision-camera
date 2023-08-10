@@ -293,6 +293,18 @@ export class Camera extends React.PureComponent<CameraProps> {
       throw tryParseNativeCameraError(e);
     }
   }
+  /**
+   * Update the exposure settings to the specified values and lock changes.
+   * @param iso
+   * @returns
+   */
+  public async updateExposureSettings(iso: Number): Promise<void> {
+    try {
+      return CameraModule.updateExposureSettings(this.handle, iso);
+    } catch (e) {
+      throw tryParseNativeCameraError(e);
+    }
+  }
   //#endregion
 
   /**
