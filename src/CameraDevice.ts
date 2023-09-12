@@ -178,6 +178,14 @@ export interface CameraDeviceFormat {
    * The most common format is `420v`. Some formats (like `x420`) are not compatible with some frame processor plugins (e.g. MLKit)
    */
   pixelFormat: PixelFormat;
+  /**
+   * Specifies this formats' maximum exposure duration value in ms.
+   */
+  maxExposureDuration: number;
+  /**
+   * Specifies this formats' minimum exposure duration value in ms.
+   */
+  minExposureDuration: number;
 }
 
 /**

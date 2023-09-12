@@ -202,7 +202,8 @@ public final class CameraView: UIView {
     let shouldCheckActive = willReconfigure || changedProps.contains("isActive") || captureSession.isRunning != isActive
     let shouldUpdateTorch = willReconfigure || changedProps.contains("torch") || shouldCheckActive
     let shouldUpdateZoom = willReconfigure || changedProps.contains("zoom") || shouldCheckActive
-    let shouldUpdateVideoStabilization = willReconfigure || changedProps.contains("videoStabilizationMode")
+		let shouldUpdateExposure = willReconfigure || changedProps.contains("iso") || changedProps.contains("exposureDuration")
+		let shouldUpdateVideoStabilization = willReconfigure || changedProps.contains("videoStabilizationMode")
     let shouldUpdateOrientation = changedProps.contains("orientation")
 
     if shouldReconfigure ||
