@@ -96,6 +96,18 @@ final class CameraViewManager: RCTViewManager {
 		
 		component.updateExposureSettings(iso: iso, exposureDuration: exposureDuration, promise: promise)
 	}
+	
+	@objc
+	final func lockCurrentExposureSettings(_ node: NSNumber, locked: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+		let component = getCameraView(withTag: node)
+		let promise = Promise(resolver: resolve, rejecter: reject)
+		
+		guard let locked = locked as? Bool else {
+			promise.reject(error: .parameter(.invalid(unionName: "locked", receivedValue: locked.description)))
+		}
+		
+		component.lockCurrentExposureSettings(locked: locked, promise: promise)
+	}
 
   @objc
   final func getAvailableVideoCodecs(_ node: NSNumber, fileType: String?, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {

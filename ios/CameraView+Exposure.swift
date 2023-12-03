@@ -20,6 +20,7 @@ extension CameraView {
 			
 			do {
 				try device.lockForConfiguration()
+				print("Setting ISO to " + (iso as String))
 				
 				self.fixedISO = iso != "auto"
 				self.fixedExposureDuration = exposureDuration != "auto"
@@ -39,6 +40,36 @@ extension CameraView {
 				
 				device.unlockForConfiguration()
 			} catch {
+				throw CameraError.device(DeviceError.configureError)
+			}
+			
+			return nil
+		}
+	}
+	
+	func lockCurrentExposureSettings(locked: Bool, promise: Promise) {
+		withPromise(promise) {
+			guard let device = self.videoDeviceInput?.device else {
+				throw CameraError.session(SessionError.cameraNotReady)
+			}
+			if !device.isExposureModeSupported(.custom) {
+				throw CameraError.device(DeviceError.customExposureNotSupported)
+			}
+			
+			do {
+				try device.lockForConfiguration()
+				
+				if (locked) {
+					device.exposureMode = .custom
+					
+					device.setExposureModeCustom(duration: AVCaptureDevice.currentExposureDuration, iso: AVCaptureDevice.currentISO)
+				} else {
+					device.exposureMode = .continuousAutoExposure
+				}
+
+				device.unlockForConfiguration()
+			}
+			catch {
 				throw CameraError.device(DeviceError.configureError)
 			}
 			
