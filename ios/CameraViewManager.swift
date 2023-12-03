@@ -88,11 +88,25 @@ final class CameraViewManager: RCTViewManager {
 	final func updateExposureSettings(_ node: NSNumber, settings: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
 		let component = getCameraView(withTag: node)
 		let promise = Promise(resolver: resolve, rejecter: reject)
-		guard let iso = settings["iso"] as? NSString else {
+
+		guard let iso = settings["iso"] as? NSString, let exposureDuration = settings["exposureDuration"] as? NSString else {
 			promise.reject(error: .parameter(.invalid(unionName: "settings", receivedValue: settings.description)))
 			return
 		}
-		component.updateExposureSettings(iso: iso, promise: promise)
+		
+		component.updateExposureSettings(iso: iso, exposureDuration: exposureDuration, promise: promise)
+	}
+	
+	@objc
+	final func lockCurrentExposureSettings(_ node: NSNumber, locked: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+		let component = getCameraView(withTag: node)
+		let promise = Promise(resolver: resolve, rejecter: reject)
+		
+		guard let locked = locked as? Bool else {
+			promise.reject(error: .parameter(.invalid(unionName: "locked", receivedValue: locked.description)))
+		}
+		
+		component.lockCurrentExposureSettings(locked: locked, promise: promise)
 	}
 
   @objc
@@ -143,8 +157,8 @@ final class CameraViewManager: RCTViewManager {
           "supportsRawCapture": false, // TODO: supportsRawCapture
           "supportsLowLightBoost": $0.isLowLightBoostSupported,
           "supportsFocus": $0.isFocusPointOfInterestSupported,
-          "formats": $0.formats.map { format -> [String: Any] in
-            format.toDictionary()
+					"formats": $0.formats.map { format -> [String: Any] in
+						format.toDictionary()
           },
         ]
       }

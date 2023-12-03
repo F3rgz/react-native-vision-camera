@@ -9,12 +9,46 @@ import Foundation
 import AVFoundation
 
 extension CameraView {
-	func updateExposureSettings(iso: NSString, promise: Promise) {
+	func updateExposureSettings(iso: NSString, exposureDuration: NSString, promise: Promise) {
 		withPromise(promise) {
 			guard let device = self.videoDeviceInput?.device else {
 				throw CameraError.session(SessionError.cameraNotReady)
 			}
+			if !device.isExposureModeSupported(.custom) {
+				throw CameraError.device(DeviceError.customExposureNotSupported)
+			}
 			
+			do {
+				try device.lockForConfiguration()
+				print("Setting ISO to " + (iso as String))
+				
+				self.fixedISO = iso != "auto"
+				self.fixedExposureDuration = exposureDuration != "auto"
+				
+				if (self.fixedISO || self.fixedExposureDuration) {
+					device.exposureMode = .custom
+					
+					let durationValue = self.fixedExposureDuration ? CMTimeMake(value: 1, timescale: exposureDuration.intValue) : AVCaptureDevice.currentExposureDuration
+					let isoValue = self.fixedISO ? Float(iso.doubleValue) : AVCaptureDevice.currentISO
+					
+					device.setExposureModeCustom(duration: durationValue, iso: isoValue)
+					
+					// TODO: Set up function to auto-set values if either iso or exposure have been fixed
+				} else {
+					device.exposureMode = .continuousAutoExposure
+				}
+				
+				device.unlockForConfiguration()
+			} catch {
+				throw CameraError.device(DeviceError.configureError)
+			}
+			
+			return nil
+		}
+	}
+	
+	func lockCurrentExposureSettings(locked: Bool, promise: Promise) {
+		withPromise(promise) {
 			guard let device = self.videoDeviceInput?.device else {
 				throw CameraError.session(SessionError.cameraNotReady)
 			}
@@ -25,24 +59,49 @@ extension CameraView {
 			do {
 				try device.lockForConfiguration()
 				
-				if (iso == "auto") {
-					print("setting auto")
-					self.fixedISO = false
-					device.exposureMode = .continuousAutoExposure
-				} else {
-					print("setting fixed iso")
-					print(iso)
-					self.fixedISO = true
+				if (locked) {
 					device.exposureMode = .custom
-					device.setExposureModeCustom(duration: AVCaptureDevice.currentExposureDuration, iso: Float(iso.doubleValue))
+					
+					device.setExposureModeCustom(duration: AVCaptureDevice.currentExposureDuration, iso: AVCaptureDevice.currentISO)
+				} else {
+					device.exposureMode = .continuousAutoExposure
 				}
-				
+
 				device.unlockForConfiguration()
-			} catch {
+			}
+			catch {
 				throw CameraError.device(DeviceError.configureError)
 			}
 			
 			return nil
+		}
+	}
+	
+	public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+
+		guard let key = keyPath else {
+				print("Not calling")
+				return
+		}
+		
+		guard let device: AVCaptureDevice = videoDeviceInput?.device else {
+			invokeOnError(.session(.cameraNotReady))
+			return
+		}
+		
+		if key == "exposureTargetOffset" {
+			let body: NSDictionary = [
+				"iso": device.iso,
+				"aperture": device.lensAperture,
+				"evOffset": device.exposureTargetOffset,
+				"exposureDuration": device.exposureDuration.seconds,
+				"lensPosition": device.lensPosition,
+				"minExposureTargetBias": device.minExposureTargetBias,
+				"maxExposureTargetBias": device.maxExposureTargetBias,
+				"exposureTargetBias": device.exposureTargetBias
+			]
+			
+			CameraEventEmitter.emitter.sendEvent(withName: "onChanged", body: body)
 		}
 	}
 }

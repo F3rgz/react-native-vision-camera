@@ -273,33 +273,5 @@ extension CameraView {
       }
     }
   }
-	
-	public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-
-		guard let key = keyPath, let changes = change else {
-				print("Not calling")
-				return
-		}
-		
-		guard let device: AVCaptureDevice = videoDeviceInput?.device else {
-			invokeOnError(.session(.cameraNotReady))
-			return
-		}
-//		ReactLogger.log(level: .info, message: NSString(format: "%.2f", device.lensPosition) as String)
-		
-		if key == "exposureTargetOffset" {
-			let newExposureTargetOffset = changes[NSKeyValueChangeKey.newKey] as! Float
-//			ReactLogger.log(level: .info, message: "Offset is : \(newExposureTargetOffset)")
-			
-			let body: NSDictionary = [
-				"iso": device.iso, 
-				"aperture": device.lensAperture,
-				"evOffset": device.exposureTargetOffset,
-				"shutterSpeed": device.exposureDuration.seconds,
-				"lensPosition": device.lensPosition
-			]
-			CameraEventEmitter.emitter.sendEvent(withName: "onChanged", body: body)
-		}
-	}
 }
 

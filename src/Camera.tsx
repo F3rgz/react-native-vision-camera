@@ -295,12 +295,26 @@ export class Camera extends React.PureComponent<CameraProps> {
   }
   /**
    * Update the exposure settings to the specified values and lock changes.
-   * @param iso
-   * @returns
+   * @param settings any The camera settings to set the CameraDevice to. This should include
+   * an ISO value and an exposureDuration value. Passing both props as type 'any' will
+   * reset the Camera device to continuous exposure updates.
+   * @returns Promise<void>
    */
   public async updateExposureSettings(settings: any): Promise<void> {
     try {
       return CameraModule.updateExposureSettings(this.handle, settings);
+    } catch (e) {
+      throw tryParseNativeCameraError(e);
+    }
+  }
+  /**
+   * Locks the CameraDevice's current exposure settings
+   * @param state
+   * @returns Promise<void>
+   */
+  public async lockCurrentExposureSettings(state: boolean): Promise<void> {
+    try {
+      return CameraModule.lockCurrentExposureSettings(this.handle, state);
     } catch (e) {
       throw tryParseNativeCameraError(e);
     }

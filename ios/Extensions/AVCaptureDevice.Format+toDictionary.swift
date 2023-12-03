@@ -43,6 +43,9 @@ extension AVCaptureDevice.Format {
         ]
       },
       "pixelFormat": CMFormatDescriptionGetMediaSubType(formatDescription).toString(),
+			// Convert exposureDuration values to milliseconds.
+			"minExposureDuration": CMTimeGetSeconds(minExposureDuration) * 1000,
+			"maxExposureDuration": CMTimeGetSeconds(maxExposureDuration) * 1000,
     ]
 
     if #available(iOS 13.0, *) {
